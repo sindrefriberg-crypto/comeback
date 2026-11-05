@@ -1,0 +1,825 @@
+<!doctype html>
+<html lang="no">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<meta name="description" content="Klikkbar prototype av COMEBACK – et seksukers lagprogram som hjelper treningssentermedlemmer tilbake til trening.">
+<meta name="apple-mobile-web-app-capable" content="yes">
+<meta name="theme-color" content="#1d3557">
+<style>
+html{color-scheme:light}
+:root{padding-top:env(safe-area-inset-top,0px);padding-bottom:env(safe-area-inset-bottom,0px)}
+body{margin:0}
+[hidden]{display:none!important}
+</style>
+<title>COMEBACK-appen</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Archivo:wght@400;500;600;800&family=Caveat:wght@600&display=swap">
+<style>
+/* Layout: one phone-width app column, scrolling content above a fixed tab bar; onboarding runs full-height without tabs */
+:root{
+  --bg:#eef2f7; --surface:#ffffff; --surface-2:#f3f6fa; --ink:#1d3557; --ink-2:#3d4f69; --muted:#5b6b82; --line:#dbe3ec;
+  --green:#187a4f; --green-soft:#d4eedf; --on-green:#ffffff;
+  --blue:#5fb0e8; --blue-soft:#e3f1fb; --on-blue:#1d3557;
+  --amber:#ffd23f; --amber-edge:#b07800; --amber-glow:rgba(255,196,0,.35);
+  --busy:#cdd6e1; --navy:#1d3557; --on-navy:#ffffff;
+  --display:"Archivo", "Helvetica Neue", Arial, sans-serif;
+  --body:"Archivo", "Helvetica Neue", Arial, sans-serif;
+  --hand:"Caveat", "Comic Sans MS", cursive;
+}
+@media (prefers-color-scheme: dark){:root:not([data-theme="light"]){
+  --bg:#0c1524; --surface:#16233a; --surface-2:#1d2d48; --ink:#e7eef8; --ink-2:#c3cfe0; --muted:#9aabc2; --line:#2a3c5a;
+  --green:#3cbf80; --green-soft:#1b3d33; --on-green:#06180f;
+  --blue:#6bb8f0; --blue-soft:#1b3350; --on-blue:#0b1a2c;
+  --amber:#ffd23f; --amber-edge:#ffd23f; --amber-glow:rgba(255,210,63,.3);
+  --busy:#34465f; --navy:#2a4370; --on-navy:#ffffff; color-scheme:dark}}
+:root[data-theme="dark"]{
+  --bg:#0c1524; --surface:#16233a; --surface-2:#1d2d48; --ink:#e7eef8; --ink-2:#c3cfe0; --muted:#9aabc2; --line:#2a3c5a;
+  --green:#3cbf80; --green-soft:#1b3d33; --on-green:#06180f;
+  --blue:#6bb8f0; --blue-soft:#1b3350; --on-blue:#0b1a2c;
+  --amber:#ffd23f; --amber-edge:#ffd23f; --amber-glow:rgba(255,210,63,.3);
+  --busy:#34465f; --navy:#2a4370; --on-navy:#ffffff; color-scheme:dark}
+
+html,body{height:100%}
+body{background:var(--bg);color:var(--ink);font-family:var(--body);font-size:15px;line-height:1.45;
+  padding-left:max(0px, env(safe-area-inset-left,0px));padding-right:max(0px, env(safe-area-inset-right,0px))}
+*{box-sizing:border-box}
+button,input,textarea{font:inherit;color:inherit}
+button{cursor:pointer}
+:focus-visible{outline:3px solid var(--blue);outline-offset:2px;border-radius:8px}
+@media (prefers-reduced-motion: reduce){*{transition:none!important;animation:none!important}}
+
+#app{max-width:440px;height:100%;margin:0 auto;background:var(--bg);display:flex;flex-direction:column;position:relative}
+.scroll>*{flex-shrink:0}
+.scroll{flex:1;min-height:0;overflow-y:auto;padding:20px max(16px, env(safe-area-inset-left,0px)) 24px max(16px, env(safe-area-inset-right,0px));display:flex;flex-direction:column;gap:14px}
+.top{padding:18px 16px 12px;background:var(--surface);border-bottom:1px solid var(--line);display:flex;align-items:center;gap:10px}
+.top h1{margin:0;font-family:var(--display);font-size:22px;font-weight:800;letter-spacing:-.01em;text-wrap:balance}
+.top .sub{font-size:13px;color:var(--muted)}
+.mark{font-family:var(--display);font-weight:800;letter-spacing:-.01em}
+.mark b{color:var(--green)}
+.eyebrow{font-size:11.5px;font-weight:800;letter-spacing:.09em;text-transform:uppercase;color:var(--muted)}
+.card{background:var(--surface);border-radius:16px;padding:16px;display:flex;flex-direction:column;gap:10px}
+.row{display:flex;align-items:center;gap:10px}
+.grow{flex:1;min-width:0}
+.btn{min-height:48px;border-radius:14px;border:none;padding:0 18px;font-weight:800;font-size:15px;display:inline-flex;align-items:center;justify-content:center;gap:8px}
+.btn:disabled{opacity:.45;cursor:not-allowed}
+.btn-green{background:var(--green);color:var(--on-green)}
+.btn-ghost{background:transparent;border:2px solid var(--ink);color:var(--ink)}
+.btn-blue{background:var(--blue);color:var(--on-blue)}
+.btn-wide{width:100%}
+.pill{border-radius:999px;padding:3px 10px;font-size:11.5px;font-weight:800;letter-spacing:.04em}
+.pill-green{background:var(--green);color:var(--on-green)}
+.pill-blue{background:var(--blue);color:var(--on-blue)}
+.pill-soft{background:var(--surface-2);color:var(--ink-2)}
+.av{width:36px;height:36px;border-radius:50%;display:flex;align-items:center;justify-content:center;font-weight:800;font-size:12px;flex-shrink:0;color:#fff}
+.muted{color:var(--muted)}
+.small{font-size:13px}
+.hand{font-family:var(--hand);font-size:24px;line-height:1.1;color:var(--ink)}
+
+.exp{background:var(--surface);border-radius:16px;overflow:hidden}
+.exp-head{width:100%;min-height:56px;background:none;border:none;text-align:left;padding:14px 16px;display:flex;align-items:center;gap:12px}
+.exp-head .chev{transition:transform .2s;flex-shrink:0}
+.exp[data-open="1"] .chev{transform:rotate(180deg)}
+.exp-body{padding:0 16px 16px;display:flex;flex-direction:column;gap:10px}
+
+.tabs{display:grid;grid-template-columns:repeat(4,minmax(0,1fr));background:var(--surface);border-top:1px solid var(--line);
+  padding:6px max(6px, env(safe-area-inset-left,0px)) calc(8px + env(safe-area-inset-bottom,0px)) max(6px, env(safe-area-inset-right,0px))}
+.tab{background:none;border:none;min-height:52px;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:3px;font-size:11.5px;font-weight:600;color:var(--muted)}
+.tab[aria-current="page"]{color:var(--green);font-weight:800}
+.tab .ic{position:relative;display:inline-flex}
+.badge{position:absolute;top:-3px;right:-6px;width:10px;height:10px;border-radius:50%;background:var(--green);border:2px solid var(--surface)}
+
+.bubble{max-width:84%;padding:11px 14px;border-radius:18px;font-size:15.5px;line-height:1.4}
+.in{align-self:flex-start;background:var(--surface);border-bottom-left-radius:5px}
+.out{align-self:flex-end;background:var(--navy);color:var(--on-navy);border-bottom-right-radius:5px}
+
+.week{display:grid;grid-template-columns:repeat(7,minmax(0,1fr));gap:6px;text-align:center}
+.day{display:flex;flex-direction:column;align-items:center;gap:5px;font-size:12px;font-weight:800}
+.cell{height:40px;width:100%;border-radius:9px;background:var(--surface-2);display:flex;align-items:center;justify-content:center}
+.cell.today{outline:2px solid var(--ink);outline-offset:-2px}
+.dot{width:22px;height:22px;border-radius:50%;flex-shrink:0}
+.d-okt{background:var(--green)}
+.d-planb{background:var(--blue)}
+.d-plan{background:var(--green-soft);border:3px solid var(--green)}
+.d-xdone{background:var(--amber);border:2px solid var(--amber-edge);box-shadow:0 0 0 4px var(--amber-glow)}
+.d-extra{background:var(--surface);border:3px solid var(--amber-edge);box-shadow:0 0 0 3px var(--amber-glow);display:flex;align-items:center;justify-content:center;font-weight:800;font-size:15px;line-height:1;color:var(--ink)}
+button.cell{border:none;padding:0;color:inherit;font:inherit}
+button.cell:hover{background:var(--line)}
+.wnav{width:44px;height:44px;border-radius:12px;border:2px solid var(--line);background:var(--surface);display:flex;align-items:center;justify-content:center;flex-shrink:0}
+.wnav:disabled{opacity:.35;cursor:not-allowed}
+.seg4{display:grid;grid-template-columns:repeat(4,minmax(0,1fr));gap:6px}
+.seg4 .choice{text-align:center;padding:4px;font-size:13px}
+.bmgrid{display:grid;grid-template-columns:repeat(7,minmax(0,1fr));gap:4px}
+.bmday{min-height:104px;border-radius:10px;border:2px solid transparent;background:var(--surface-2);display:flex;flex-direction:column;align-items:center;gap:3px;padding:6px 2px;color:inherit}
+.bmday[aria-pressed="true"]{border-color:var(--green);background:var(--green-soft)}
+.bmday.today{outline:2px solid var(--ink);outline-offset:-2px}
+.bmday.past{opacity:.45}
+.chips{display:flex;flex-direction:column;gap:3px;align-items:center;margin-top:2px}
+.mini{width:24px;height:24px;border-radius:50%;font-size:9px;font-weight:800;color:#fff;display:flex;align-items:center;justify-content:center}
+.lagtag{font-size:8.5px;font-weight:800;letter-spacing:.04em;background:var(--green);color:var(--on-green);border-radius:4px;padding:1px 4px}
+.xitem{display:flex;align-items:center;gap:10px;padding:10px 12px;border-radius:12px;background:var(--surface-2);flex-wrap:wrap}
+.legend{display:flex;gap:14px;flex-wrap:wrap;font-size:12px;color:var(--muted)}
+.legend span{display:flex;align-items:center;gap:6px}
+.legend i{display:inline-block;width:12px;height:12px;border-radius:50%}
+
+.map{display:grid;grid-template-columns:62px repeat(7,minmax(0,1fr));gap:5px;align-items:center}
+.map .h{font-size:12px;font-weight:800;text-align:center}
+.map .lbl{font-size:12px;font-weight:800;line-height:1.15}
+.map .lbl span{display:block;font-weight:500;color:var(--muted);font-size:10.5px}
+.slot{height:48px;border-radius:8px;border:2px solid transparent;font-size:10px;font-weight:800;padding:0;display:flex;align-items:center;justify-content:center}
+.s-o{background:var(--busy);color:var(--ink-2)}
+.s-k{background:transparent;border:2px dashed var(--muted);color:var(--muted)}
+.s-r{background:var(--green-soft);border-color:var(--green);color:var(--green)}
+.s-pick{box-shadow:inset 0 0 0 2px var(--amber-edge);background:var(--amber);color:#3a2a00;border-color:var(--amber-edge)}
+
+.seg{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:8px}
+.seg7{display:grid;grid-template-columns:repeat(7,minmax(0,1fr));gap:4px}
+.seg6{display:grid;grid-template-columns:repeat(6,minmax(0,1fr));gap:4px}
+.choice{min-height:48px;border-radius:12px;border:2px solid var(--line);background:var(--surface);font-weight:800;padding:8px 12px;text-align:left}
+.seg .choice,.seg7 .choice,.seg6 .choice{text-align:center;padding:4px}
+.choice[aria-pressed="true"]{border-color:var(--green);background:var(--green-soft);color:var(--ink)}
+.check{display:flex;align-items:center;gap:12px;min-height:44px;font-size:15px}
+.check input{width:22px;height:22px;accent-color:var(--green)}
+textarea,input[type="text"]{width:100%;border:2px solid var(--line);border-radius:12px;background:var(--surface);padding:10px 12px;font-size:15px}
+textarea{resize:vertical;min-height:70px}
+
+.scrim{position:absolute;inset:0;background:rgba(10,20,35,.45);display:flex;align-items:flex-end;z-index:20}
+.sheet{width:100%;background:var(--bg);border-radius:20px 20px 0 0;padding:18px 16px calc(18px + env(safe-area-inset-bottom,0px));display:flex;flex-direction:column;gap:12px;max-height:85%;overflow-y:auto}
+.toast{position:absolute;left:16px;right:16px;bottom:calc(84px + env(safe-area-inset-bottom,0px));background:var(--navy);color:var(--on-navy);border-radius:14px;padding:12px 16px;font-weight:600;z-index:30;display:flex;gap:10px;align-items:center}
+
+.progress{height:8px;border-radius:99px;background:var(--surface-2);overflow:hidden}
+.progress i{display:block;height:100%;background:var(--green);border-radius:99px;transition:width .3s}
+.steps{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:8px;align-items:end}
+.stair{border-radius:14px;padding:12px;display:flex;flex-direction:column;gap:4px;font-size:12.5px}
+.big{font-family:var(--display);font-size:48px;font-weight:800;line-height:1}
+.mood{min-height:86px;border-radius:14px;border:2px solid transparent;background:var(--surface-2);display:flex;flex-direction:column;align-items:center;justify-content:center;gap:6px;font-weight:800;font-size:13px}
+.mood[aria-pressed="true"]{border-color:var(--green);background:var(--green-soft)}
+.restart{background:none;border:none;color:var(--muted);text-decoration:underline;min-height:44px;font-size:13px}
+.ex{display:flex;justify-content:space-between;gap:12px;padding:8px 0;border-bottom:1px solid var(--line);font-size:14px}
+.ex:last-child{border-bottom:none}
+.steplist{margin:0;padding:0;list-style:none;display:flex;flex-direction:column;gap:10px;counter-reset:s}
+.steplist li{display:flex;gap:12px;align-items:flex-start;font-size:14px;counter-increment:s}
+.steplist li::before{content:counter(s);flex-shrink:0;width:26px;height:26px;border-radius:50%;background:var(--blue);color:var(--on-blue);font-weight:800;font-size:13px;display:flex;align-items:center;justify-content:center}
+.tips{margin:0;padding-left:18px;font-size:14px;display:flex;flex-direction:column;gap:4px}
+.time{display:flex;align-items:center;gap:12px;padding:10px 12px;border-radius:12px;background:var(--surface-2)}
+</style>
+</head>
+<body>
+
+<div id="app" aria-live="polite"></div>
+
+<script>
+(function(){
+const DAYS=['M','T','O','T','F','L','S'];
+const DAYNAMES=['mandag','tirsdag','onsdag','torsdag','fredag','lørdag','søndag'];
+const MONTHS=['jan','feb','mar','apr','mai','jun','jul','aug','sep','okt','nov','des'];
+const ROWS=[['Morgen','06–09'],['Dagtid','09–16'],['Etterm.','16–19'],['Kveld','19–22']];
+const cap=s=>s[0].toUpperCase()+s.slice(1);
+const slotTime=(r,d)=>r===0?'06:30':r===1?(d>=5?'10:00':'12:00'):r===2?'17:00':'20:00';
+const MATES=[['JU','Julie','#7a5ea8'],['AN','Andreas','#2b6cb0'],['KA','Kari','#b0662b'],['OL','Ola','#3d7f8c'],['SA','Sara','#8c3d6b']];
+const PLANB=['Hvis jeg ikke rekker laget, så tar jeg 20 min hjemmeøkt','Hvis jeg ikke rekker laget, så går jeg en tur i stedet','Hvis jeg ikke rekker laget, så tar jeg 10 min mobilitet neste morgen'];
+const WORKOUTS=[
+  {id:'legging',min:20,name:'Etter legging',desc:'Rolig styrke · stille, ingen hopp',ex:[['Knebøy','3 × 12'],['Utfall','3 × 10 per bein'],['Seteløft på gulvet','3 × 15'],['Planke','3 × 30 sek'],['Rolig tøying','3 min']]},
+  {id:'kick',min:15,name:'Kroppsvekt-kick',desc:'Hele kroppen · ingen utstyr',ex:[['Marsj på stedet','1 min'],['Push-ups på knærne','3 × 8'],['Knebøy','3 × 15'],['Fjellklatrer, rolig tempo','3 × 30 sek'],['Pust ut og tøy','2 min']]},
+  {id:'gatur',min:30,name:'Gåtur med intervaller',desc:'Ute · funker med ungene',ex:[['Rolig gange','5 min'],['Rask gange','1 min'],['Rolig gange','2 min'],['Gjenta rask/rolig','5 ganger til'],['Rolig gange hjem','7 min']]},
+  {id:'mob',min:10,name:'Mobilitet',desc:'Rolig · for de travleste dagene',ex:[['Katt og ku','1 min'],['Hofteåpner','1 min per side'],['Brystrotasjon','1 min per side'],['Bakside lår','1 min per side'],['Dype pust','1 min']]}
+];
+const MOODS=[['tung','Tungt','M8.5 16.5c2-1.4 5-1.4 7 0'],['ok','Helt ok','M8.5 15h7'],['god','Kjempegodt','M8 14.5c2 2.6 6 2.6 8 0']];
+
+function initial(){
+  return {
+    v:2, screen:'sms', tab:'uka', open:{},
+    map:['oooookk'.split(''),'ooooorr'.split(''),'oroookk'.split(''),'kkrkkok'.split('')],
+    picks:[], start:null, sim:{on:false,week:0,day:0}, logs:{}, attending:null, extras:{}, viewWeek:null, draft:null,
+    avtale:{mal:'Komme tilbake til fast trening og få mer overskudd i hverdagen',okter:2,planB:PLANB[0],custom:'',stotte:{lag:true,pt:true,hjemme:true},henting:true,signert:false},
+    session:null, logg:null, sheet:null, compose:'',
+    feedV:3, lagTab:'uka', joins:{}, bmFilter:'alle', cmtOpen:null, cmtText:'',
+    feed:[
+      {id:1,who:'Julie',ini:'JU',col:'#7a5ea8',when:'i går 18:05',type:'okt',text:'Første lagøkt på tre uker – var nervøs, men det gikk fint!',heia:['Andreas','Kari','Jonas'],comments:[{who:'Jonas',text:'Sånn skal det gjøres! Godt å ha deg tilbake.'}]},
+      {id:2,who:'Andreas',ini:'AN',col:'#2b6cb0',when:'i går 21:40',type:'planb',text:'Rakk ikke lagøkta – sykt barn. Tok 15 min kroppsvekt-kick etter legging i stedet.',heia:['Julie','Sara'],comments:[{who:'Julie',text:'Rekka holder!'}]},
+      {id:3,who:'Jonas · PT',ini:'JO',col:'#1d3557',when:'mandag',type:'pt',text:'Husk: plan B teller like mye som en lagøkt. En dårlig uke bryter ikke rekka.',heia:['Julie','Andreas','Kari','Ola'],comments:[]},
+      {id:4,who:'Kari',ini:'KA',col:'#b0662b',when:'mandag',type:'msg',text:'Kommer litt sent på neste lagøkt – bare start uten meg!',heia:[],comments:[{who:'Ola',text:'Vi holder av en benk til deg.'}]}
+    ]
+  };
+}
+let S;
+try{const raw=localStorage.getItem('comeback-app-v2'); S=raw?JSON.parse(raw):null;}catch(e){S=null}
+if(!S||S.v!==2)S=initial();
+if(!S.extras)S.extras={};
+if(S.feedV!==3){const i0=initial();S.feed=i0.feed;S.feedV=3;S.lagTab='uka';S.joins={};S.bmFilter='alle';S.cmtOpen=null;S.cmtText='';}
+const EXTRA_WHAT=[['styrke','Styrke på senteret'],['kondis','Kondisjon på senteret'],['ute','Ute – tur eller løping'],['hjemme','Hjemmeøkt']];
+const CAT={styrke:'Styrke · senter',kondis:'Kondisjon · senter',ute:'Ute',hjemme:'Hjemme',senter:'Senter',tur:'Ute'};
+const SLOT_NAMES=['Morgen','Dagtid','Ettermiddag','Kveld'];
+let toastTimer=null;
+function save(){try{localStorage.setItem('comeback-app-v2',JSON.stringify(Object.assign({},S,{sheet:null,toast:null})))}catch(e){}}
+const esc=v=>String(v).replace(/[&<>"']/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]));
+
+/* ---------- time + plan, all driven by the ukekart ---------- */
+function mondayOf(dt){const d=new Date(dt.getFullYear(),dt.getMonth(),dt.getDate());d.setDate(d.getDate()-((d.getDay()+6)%7));return d;}
+function startMonday(){return mondayOf(S.start?new Date(S.start):new Date());}
+function now(){
+  if(S.sim.on)return {week:S.sim.week,day:S.sim.day};
+  const t=new Date(), m=startMonday();
+  const diff=Math.floor((mondayOf(t)-m)/864e5/7);
+  return {week:Math.max(0,Math.min(5,diff)),day:(t.getDay()+6)%7};
+}
+function dateOf(w,d){const x=startMonday();x.setDate(x.getDate()+w*7+d);return x.getDate()+'. '+MONTHS[x.getMonth()];}
+function weekLabel(w){const d=startMonday();d.setDate(d.getDate()+w*7);return d.getDate()+'. '+MONTHS[d.getMonth()];}
+function computePicks(){
+  const cands=[];
+  S.map.forEach((row,r)=>row.forEach((c,d)=>{if(c!=='o')cands.push({r,d,score:c==='r'?2:1,time:slotTime(r,d)});}));
+  // one slot per day: keep the best (ja before kanskje, then ettermiddag/kveld before morgen)
+  const pref=[2,3,1,0], byDay={};
+  cands.forEach(c=>{const b=byDay[c.d]; if(!b||c.score>b.score||(c.score===b.score&&pref.indexOf(c.r)<pref.indexOf(b.r)))byDay[c.d]=c;});
+  let pool=Object.values(byDay); const picks=[];
+  const dist=(a,b)=>{const x=Math.abs(a-b);return Math.min(x,7-x);};
+  while(picks.length<3&&pool.length){
+    pool.sort((a,b)=>{
+      const sa=a.score*10+(picks.length?Math.min(...picks.map(p=>dist(p.d,a.d))):0);
+      const sb=b.score*10+(picks.length?Math.min(...picks.map(p=>dist(p.d,b.d))):0);
+      return sb-sa||a.d-b.d;});
+    picks.push(pool.shift());
+  }
+  S.picks=picks;
+}
+function plan(){return S.picks.slice(0,S.avtale.okter).slice().sort((a,b)=>a.d-b.d);}
+function planAt(d){return plan().find(p=>p.d===d);}
+function teamName(){const p=plan();return p.length?cap(DAYNAMES[p[0].d])+'slaget':'Treningsparet';}
+function lagTimes(){return plan().map(p=>DAYNAMES[p.d]+' '+p.time).join(' og ');}
+function mark(w,d,n){
+  const l=S.logs[w+'-'+d]; if(l)return l;
+  if(S.extras[w+'-'+d]&&(w>n.week||(w===n.week&&d>=n.day)))return 'extra';
+  if(planAt(d)&&(w>n.week||(w===n.week&&d>=n.day)))return 'plan';
+  return '';
+}
+function nextSession(n){
+  for(let w=n.week;w<6;w++)for(let d=(w===n.week?n.day:0);d<7;d++){const p=planAt(d); if(p&&!S.logs[w+'-'+d])return {w,d,time:p.time,today:w===n.week&&d===n.day};}
+  return null;
+}
+function streak(n){
+  const has=w=>DAYS.some((_,d)=>S.logs[w+'-'+d]);
+  let c=0,w=n.week; if(!has(w))w--;
+  for(;w>=0;w--){if(has(w))c++;else break;}
+  return c;
+}
+
+const icon={
+  chev:'<svg class="chev" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M6 9l6 6 6-6"/></svg>',
+  back:'<svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M15 6l-6 6 6 6"/></svg>',
+  uka:'<svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><rect x="3" y="4" width="18" height="17" rx="2"/><path d="M3 9h18M8 2v4M16 2v4"/></svg>',
+  laget:'<svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><circle cx="9" cy="8" r="3"/><path d="M3 20c0-3 3-5 6-5s6 2 6 5"/><circle cx="17" cy="9" r="2.5"/><path d="M16 15c3 0 5 1.6 5 4"/></svg>',
+  hjemme:'<svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M4 11l8-7 8 7v9H4z"/><path d="M10 20v-5h4v5"/></svg>',
+  meg:'<svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><circle cx="12" cy="8" r="4"/><path d="M4 21c0-4 4-6 8-6s8 2 8 6"/></svg>',
+  check:'<svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.6" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M5 12l5 5 9-10"/></svg>',
+  spark:'<svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M12 3v4M12 17v4M3 12h4M17 12h4M6 6l2.5 2.5M15.5 15.5L18 18M6 18l2.5-2.5M15.5 8.5L18 6"/></svg>',
+  plus:'<svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" aria-hidden="true"><path d="M12 5v14M5 12h14"/></svg>'
+};
+const face=d=>`<svg width="34" height="34" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" aria-hidden="true"><circle cx="12" cy="12" r="9.5"/><circle cx="9" cy="10" r=".7" fill="currentColor"/><circle cx="15" cy="10" r=".7" fill="currentColor"/><path d="${d}"/></svg>`;
+
+function exp(id,headHtml,bodyHtml){
+  const o=!!S.open[id];
+  return `<div class="exp" data-open="${o?1:0}"><button class="exp-head" data-a="toggle" data-id="${id}" aria-expanded="${o}">${headHtml}${icon.chev}</button>${o?`<div class="exp-body">${bodyHtml}</div>`:''}</div>`;
+}
+function weekRowI(w,n){return `<div class="week">${DAYS.map((d,i)=>{const m=mark(w,i,n);return `<div class="day">${d}<button class="cell${w===n.week&&i===n.day?' today':''}" data-a="cell" data-w="${w}" data-d="${i}" aria-label="${cap(DAYNAMES[i])}${m==='plan'?': planlagt lagøkt':m==='extra'?': ekstra økt':m==='okt'?': økt':m==='xdone'?': ekstra økt gjennomført':m==='planb'?': plan B':': legg til ekstra økt'}">${dotHtml(m)}</button></div>`;}).join('')}</div>`;}
+function freeDays(w,n){return [0,1,2,3,4,5,6].filter(d=>(w>n.week||(w===n.week&&d>=n.day))&&!planAt(d)&&!S.logs[w+'-'+d]&&!S.extras[w+'-'+d]);}
+function dotHtml(m){if(m==='extra')return '<span class="dot d-extra" aria-hidden="true">+</span>';if(m==='xdone')return '<span class="dot d-xdone"></span>';return m==='okt'?'<span class="dot d-okt"></span>':m==='planb'?'<span class="dot d-planb"></span>':m==='plan'?'<span class="dot d-plan"></span>':''}
+function weekRow(w,n){return `<div class="week">${DAYS.map((d,i)=>`<div class="day">${d}<div class="cell${w===n.week&&i===n.day?' today':''}">${dotHtml(mark(w,i,n))}</div></div>`).join('')}</div>`;}
+function legend(){return `<div class="legend"><span><i style="background:var(--green)"></i>Økt</span><span><i style="background:var(--blue)"></i>Plan B</span><span><i style="background:var(--amber);border:1.5px solid var(--amber-edge)"></i>Ekstra</span><span style="flex-basis:100%">Ring = planlagt · fylt = gjennomført</span></div>`}
+function timesList(){return plan().map((p,i)=>`<div class="time"><span class="dot d-plan"></span><span class="grow"><b>${cap(DAYNAMES[p.d])} ${p.time}</b><br><span class="small muted">${i<2?'Lagøkt med PT':'Egen økt'} · ${p.score===2?'du sa ja':'du sa kanskje'}</span></span></div>`).join('');}
+
+/* ---------- onboarding ---------- */
+function vSms(){
+  return `<div class="top"><div class="av" style="background:#1d3557">JO</div><div class="grow"><div style="font-weight:800">Jonas · PT</div><div class="sub">SMS · i dag</div></div></div>
+  <div class="scroll" style="gap:10px">
+    <div class="bubble in">Hei, det er Jonas, PT på senteret. Jeg starter et nytt Comeback-lag – vil du være med?</div>
+    <div class="bubble in">Vi blir rundt 6 stykker som trener sammen fast i seks uker, med meg som PT. Tidene velger vi ut fra hverdagen deres. Inkludert i medlemskapet.</div>
+    ${S.smsMore?`<div class="bubble out">Fortell meg mer først</div><div class="bubble in">Klart! Ingen prestasjonspress og ingen tester. Vi trener sammen, og når hverdagen kommer i veien har du en plan B som også teller.</div>`:''}
+    ${S.smsReply?`<div class="bubble out">Ja, jeg blir med!</div>
+      <div class="bubble in">Så bra! Første steg er et oppstartsmøte med de andre. Der finner vi tider som passer for alle.</div>
+      <button class="btn btn-green btn-wide" data-a="go" data-s="oppstart" style="margin-top:8px">Gå til oppstartsmøtet</button>`
+    :`<div style="margin-top:auto;display:flex;flex-direction:column;gap:8px">
+      <button class="btn btn-green btn-wide" data-a="smsYes">Ja, jeg blir med!</button>
+      ${S.smsMore?'':'<button class="btn btn-ghost btn-wide" data-a="smsMore">Fortell meg mer først</button>'}</div>`}
+  </div>`;
+}
+function vOppstart(){
+  return `<div class="top"><div class="grow"><div class="eyebrow">Oppstartsmøtet · 45 min</div><h1>Velkommen!</h1></div><div class="mark">COME<b>BACK</b></div></div>
+  <div class="scroll">
+    <div class="card" style="background:var(--blue-soft)"><b>Alle her har falt av før.</b><span class="small">Det er derfor dere er her. Målet er å finne en måte å trene på som tåler hverdagen, ikke å prestere.</span></div>
+    <div class="eyebrow">Dette skjer i dag</div>
+    ${exp('o1','<span class="grow"><b>1. Hva skjedde sist?</b><br><span class="small muted">I par, 5 min</span></span>','<span class="small">Tenk på sist treningen datt ut. Hva skjedde rett før? Jobb, henting, søvn eller lite overskudd? Det er der planen din trenger en reserve.</span>')}
+    ${exp('o2','<span class="grow"><b>2. Fargelegg uka di</b><br><span class="small muted">Ukekartet, 10 min</span></span>','<span class="small">Du markerer når du er opptatt, når det kanskje går, og når du realistisk kan trene. Ta med henting og legging. Det du legger inn styrer de faste tidene dine.</span>')}
+    ${exp('o3','<span class="grow"><b>3. Vi setter sammen lagene</b><br><span class="small muted">Ut fra felles tider</span></span>','<span class="small">De som har de samme ledige tidene blir et lag. PT-øktene legges til lagets tider – ikke omvendt.</span>')}
+    ${exp('o4','<span class="grow"><b>4. Avtalen og plan B</b><br><span class="small muted">Hvis–så</span></span>','<span class="small">«Hvis jeg ikke rekker laget, så …» Ingen går herfra uten en plan B. Plan B teller like mye som en lagøkt.</span>')}
+    <button class="btn btn-green btn-wide" data-a="go" data-s="ukekart">Fyll ut ukekartet</button>
+  </div>`;
+}
+function vUkekart(){
+  const lab={o:'Opptatt',k:'Kanskje',r:'Ja'};
+  let g=`<div class="map"><span></span>${DAYS.map(d=>`<span class="h">${d}</span>`).join('')}`;
+  S.map.forEach((row,ri)=>{g+=`<span class="lbl">${ROWS[ri][0]}<span>${ROWS[ri][1]}</span></span>`+row.map((c,di)=>`<button class="slot s-${c}" data-a="slot" data-r="${ri}" data-d="${di}" aria-label="${ROWS[ri][0]} ${DAYNAMES[di]}: ${lab[c]}">${lab[c]}</button>`).join('');});
+  g+='</div>';
+  const ja=S.map.flat().filter(c=>c==='r').length;
+  return `<div class="top"><button class="btn" style="padding:0 6px;min-height:44px;background:none" data-a="go" data-s="oppstart" aria-label="Tilbake">${icon.back}</button><div class="grow"><div class="eyebrow">Steg 2 av 4</div><h1>Ukekartet ditt</h1></div></div>
+  <div class="scroll">
+    <span class="small">Trykk på rutene for å bytte mellom <b>opptatt</b>, <b>kanskje</b> og <b>ja</b>. Vær ærlig – også om henting og legging. Kartet er fylt ut med et eksempel.</span>
+    <div class="card" style="padding:12px">${g}</div>
+    <div class="legend"><span><i style="background:var(--busy);border-radius:3px"></i>Opptatt</span><span><i style="border:1.5px dashed var(--muted);border-radius:3px"></i>Kanskje</span><span><i style="background:var(--green-soft);border:1.5px solid var(--green);border-radius:3px"></i>Ja, realistisk</span></div>
+    <div class="row" style="gap:8px"><button class="btn btn-ghost grow" data-a="clearMap">Tøm kartet</button><button class="btn btn-ghost grow" data-a="exampleMap">Eksempel</button></div>
+    <span class="small muted">${ja<2?'Merk minst to ruter med «ja» på ulike dager for best resultat.':`Du har ${ja} «ja»-ruter.`}</span>
+    <button class="btn btn-green btn-wide" data-a="findTeam">Finn laget mitt</button>
+  </div>`;
+}
+function vLag(){
+  const p=plan(), none=!p.length, weak=p.some(x=>x.score<2);
+  return `<div class="top"><button class="btn" style="padding:0 6px;min-height:44px;background:none" data-a="go" data-s="ukekart" aria-label="Tilbake">${icon.back}</button><div class="grow"><div class="eyebrow">Steg 3 av 4</div><h1>Laget ditt</h1></div></div>
+  <div class="scroll">
+  ${none?`<div class="card" style="background:var(--blue-soft)"><b>Vi fant ingen ledige tider.</b><span class="small">Merk minst én rute som «kanskje» eller «ja» i ukekartet, så finner vi et lag.</span></div>
+    <button class="btn btn-green btn-wide" data-a="go" data-s="ukekart">Tilbake til ukekartet</button>`:`
+    <div class="card" style="background:var(--navy);color:var(--on-navy);gap:8px">
+      <span class="eyebrow" style="color:var(--on-navy);opacity:.8">Du passer i</span>
+      <span class="big" style="font-size:34px">${teamName()}</span>
+      <span>${cap(lagTimes())} · med PT Jonas</span>
+      <div class="row" style="margin-top:4px">${MATES.map((m,i)=>`<span class="av" style="background:${m[2]};width:32px;height:32px;margin-left:${i?-8:0}px;border:2px solid var(--navy)">${m[0]}</span>`).join('')}<span class="small" style="margin-left:6px">5 andre har de samme tidene</span></div>
+    </div>
+    <div class="card"><span class="eyebrow">Dine faste tider – hentet fra ukekartet</span>${timesList()}</div>
+    ${weak?`<div class="card" style="background:var(--blue-soft)"><span class="small"><b>Én av tidene er bare «kanskje».</b> Det går fint, men da er plan B ekstra viktig. Du kan bytte lag én gang hvis uka endrer seg.</span></div>`:''}
+    ${exp('l1','<b class="grow">Hvordan valgte vi tidene?</b>','<span class="small">Vi tar «ja»-rutene dine først, så «kanskje». Vi velger én tid per dag og sprer øktene utover uka, så du får hvile mellom. Tidene blir et lag sammen med andre som har merket det samme.</span>')}
+    <button class="btn btn-green btn-wide" data-a="go" data-s="avtale">Lag avtalen min</button>
+    <button class="btn btn-ghost btn-wide" data-a="go" data-s="ukekart">Endre ukekartet</button>`}
+  </div>`;
+}
+function vAvtale(){
+  const a=S.avtale, max=S.picks.length;
+  return `<div class="top"><button class="btn" style="padding:0 6px;min-height:44px;background:none" data-a="go" data-s="lag" aria-label="Tilbake">${icon.back}</button><div class="grow"><div class="eyebrow">Steg 4 av 4</div><h1>Min COME<span style="color:var(--green)">BACK</span>-avtale</h1></div></div>
+  <div class="scroll">
+    <span class="small muted">Seks uker. Små steg. En ny start.</span>
+    <label class="card" for="mal"><span class="eyebrow">Mitt mål</span><textarea id="mal" data-f="mal">${esc(a.mal)}</textarea></label>
+    <div class="card"><span class="eyebrow">Økter i uka</span>
+      <div class="seg">${[1,2,3].map(n=>`<button class="choice" aria-pressed="${a.okter===n}" data-a="okter" data-n="${n}" ${n>max?'disabled style="opacity:.4"':''}>${n}</button>`).join('')}</div>
+      <span class="small muted">${a.okter===2?'To i uka er et godt mål – det er det forskningen kaller regelmessig trening.':a.okter===3?'Ambisiøst! Den tredje økta er en egen økt, og plan B teller også.':'En god start. Du kan øke når det sitter.'}${max<3?' Ukekartet ditt gir plass til '+max+'.':''}</span>
+    </div>
+    <div class="card"><span class="eyebrow">Faste tider</span>${timesList()}</div>
+    <div class="card" style="background:var(--blue-soft)"><span class="eyebrow">Min plan B – hvis … så</span>
+      ${PLANB.map((p,i)=>`<button class="choice" aria-pressed="${!a.custom&&a.planB===p}" data-a="planb" data-i="${i}">${p}</button>`).join('')}
+      <label for="egen" class="small"><b>Eller skriv din egen:</b></label>
+      <input id="egen" type="text" data-f="custom" placeholder="Hvis jeg ikke rekker laget, så …" value="${esc(a.custom)}">
+    </div>
+    <div class="card"><span class="eyebrow">Hvem jeg vil ha støtte fra</span>
+      <label class="check" for="c1"><input id="c1" type="checkbox" data-c="lag" ${a.stotte.lag?'checked':''}>${teamName()}</label>
+      <label class="check" for="c2"><input id="c2" type="checkbox" data-c="pt" ${a.stotte.pt?'checked':''}>PT Jonas</label>
+      <label class="check" for="c3"><input id="c3" type="checkbox" data-c="hjemme" ${a.stotte.hjemme?'checked':''}>Familien hjemme</label>
+    </div>
+    <div class="card"><span class="eyebrow">Avklart hjemme?</span>
+      <label class="check" for="c4"><input id="c4" type="checkbox" data-c="henting" ${a.henting?'checked':''}>Henting og logistikk på treningsdagene er avtalt</label>
+    </div>
+    <div class="card" style="align-items:center;text-align:center">
+      <span style="font-weight:600">«Du forplikter deg ikke til å lykkes hver gang. Du forplikter deg til å finne veien tilbake.»</span>
+      ${a.signert?`${icon.check}<span class="small muted">Signert</span>`:`<button class="btn btn-ghost btn-wide" data-a="sign">Trykk for å signere</button>`}
+    </div>
+    <button class="btn btn-green btn-wide" data-a="finish" ${a.signert?'':'disabled'}>Start seks uker</button>
+  </div>`;
+}
+
+/* ---------- app tabs ---------- */
+function vUka(){
+  const n=now(), nx=nextSession(n);
+  const done=DAYS.filter((_,d)=>S.logs[n.week+'-'+d]).length;
+  const plb=S.avtale.custom||S.avtale.planB, st=streak(n);
+  let next='';
+  if(nx){
+    const key=nx.w+'-'+nx.d, label=nx.today?'I dag':nx.w===n.week?'Senere denne uka':'Neste uke';
+    const isLag=plan().findIndex(p=>p.d===nx.d)<2, prog=program(nx);
+    next=`<div class="card"><span class="eyebrow">${label}</span>
+      <span style="font-size:19px;font-weight:800">${cap(DAYNAMES[nx.d])} ${nx.time} · ${isLag?'Lagøkt med PT':'Egen økt'}</span>
+      ${isLag?`<span class="small muted">${prog.title} · ${countsText(key)}</span>`:''}
+      ${statusBlock(key,nx,isLag)}
+      ${isLag?'<button class="btn btn-ghost btn-wide" style="border-color:var(--line)" data-a="goOkt">Se dagens program og beskjeder</button>':''}
+    </div>`;
+  } else next=`<div class="card"><b>Ingen flere planlagte økter.</b><span class="small muted">Se «Veien videre» under Meg.</span></div>`;
+  return `<div class="top"><div class="grow"><div class="mark" style="font-size:20px">COME<b>BACK</b></div><div class="sub">Uke ${n.week+1} av 6 · ${DAYNAMES[n.day]}${S.sim.on?' · testmodus':''}</div></div><span class="av" style="background:#2a7f62">DU</span></div>
+  <div class="scroll">
+    <div class="card" style="background:var(--navy);color:var(--on-navy);flex-direction:row;align-items:center;gap:16px">
+      <span class="big">${st}</span><span>${st?`${st===1?'uke':'uker på rad'} med minst én økt eller plan B. <b>Rekka holder!</b>`:'Første merke starter rekka. En plan B teller også.'}</span>
+    </div>
+    ${sharedCard()}
+    ${weekCard(n)}
+    ${next}
+    <div class="card" style="background:var(--blue-soft)"><span class="eyebrow">Min plan B</span><span>${esc(plb)}</span>
+      <button class="btn btn-blue" data-a="tab" data-t="hjemme">Se hjemmeøktene</button></div>
+    ${exp('kal','<span class="grow"><b>Mine 6 uker</b><br><span class="small muted">Hele kalenderen</span></span>',
+      [0,1,2,3,4,5].map(w=>`<div class="row" style="align-items:flex-start"><span class="small" style="width:52px;font-weight:800;padding-top:2px">Uke ${w+1}<br><span class="muted" style="font-weight:500">${w===5?'Evaluering':weekLabel(w)}</span></span><div class="grow">${weekRow(w,n)}</div></div>`).join('')+legend())}
+    ${exp('hvorfor','<span class="grow"><b>Hvorfor teller plan B?</b><br><span class="small muted">Slik fungerer reserveøkta di</span></span>',`
+      <span>Plan B er en reserveøkt du har bestemt på forhånd. Når hverdagen kommer i veien, <b>bytter</b> du i stedet for å droppe treningen.</span>
+      <span class="eyebrow">Slik fungerer det</span>
+      <ol class="steplist">
+        <li><span>Du ser at du ikke rekker lagøkta, og trykker <b>«Rekker ikke»</b>.</span></li>
+        <li><span>Laget får beskjed, og du velger en kort hjemmeøkt eller gjør planen din.</span></li>
+        <li><span>Du får et <b>blått merke</b> i kalenderen. Rekka holder.</span></li>
+      </ol>
+      <span class="eyebrow">Hvorfor det virker</span>
+      <span class="small">Folk som bytter til en annen aktivitet når planen ryker, er mer aktive totalt sett enn de som holder fast på én plan (Kelly &amp; Updegraff, 2017).</span>
+      <span class="small">Når valget er tatt på forhånd – «hvis jeg ikke rekker laget, så …» – slipper du å bestemme deg når du er sliten. Da er det lettere å faktisk gjøre det.</span>
+      <span class="small">Det farligste er ikke én tapt økt. Det er når én tapt økt blir til en tapt uke, og så en tapt måned.</span>
+      <span class="eyebrow">En god plan B er</span>
+      <ul class="tips"><li>kort – 10 til 20 minutter</li><li>uten utstyr og uten reisevei</li><li>noe du faktisk orker en dårlig dag</li></ul>
+      <div class="card" style="background:var(--blue-soft);padding:12px"><span class="eyebrow">Din plan B</span><span>${esc(plb)}</span></div>
+      <button class="btn btn-blue btn-wide" data-a="sheetB">Bruk plan B nå</button>`)}
+  </div>`;
+}
+function sharedCard(){
+  const p=S.lastShared&&S.feed.find(x=>x.id===S.lastShared); if(!p)return '';
+  return `<div class="card" style="border:2px solid ${p.type==='okt'?'var(--green)':'var(--blue)'}">
+    <div class="row"><span class="eyebrow grow">Delt med ${teamName()}</span><button class="btn" style="min-height:36px;padding:0 8px;background:none;font-size:13px;font-weight:600" data-a="dismissShared">Skjul</button></div>
+    <div class="row"><span class="dot ${p.type==='okt'?'d-okt':'d-planb'}"></span><span class="grow"><b>${esc(p.text)}</b></span></div>
+    <span class="small muted">${p.heia.length?heiaText(p)+' på deg':'Laget ser det nå – heia kommer straks …'}</span>
+    ${p.comments.map(c=>`<span class="small"><b>${esc(c.who)}:</b> ${esc(c.text)}</span>`).join('')}
+    <button class="btn btn-ghost btn-wide" style="border-color:var(--line)" data-a="goHeia">Se innlegget i Laget › Heia</button>
+  </div>`;
+}
+function weekCard(n){
+  const vw=S.viewWeek==null?n.week:S.viewWeek;
+  const dv=DAYS.filter((_,d)=>S.logs[vw+'-'+d]).length;
+  const xs=Object.keys(S.extras).filter(k=>+k.split('-')[0]===vw).map(k=>({k,d:+k.split('-')[1],...S.extras[k]})).sort((a,b)=>a.d-b.d);
+  const free=freeDays(vw,n);
+  const tag=vw===n.week?'Denne uka':vw<n.week?'Tidligere uke':'Kommende uke';
+  const arrow=dir=>`<svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="${dir<0?'M15 6l-6 6 6 6':'M9 6l6 6-6 6'}"/></svg>`;
+  return `<div class="card">
+    <div class="row"><button class="wnav" data-a="wk" data-n="-1" ${vw<=0?'disabled':''} aria-label="Forrige uke">${arrow(-1)}</button>
+      <div class="grow" style="text-align:center"><div class="eyebrow">${tag}</div><b>Uke ${vw+1} av 6 · ${weekLabel(vw)}</b></div>
+      <button class="wnav" data-a="wk" data-n="1" ${vw>=5?'disabled':''} aria-label="Neste uke">${arrow(1)}</button></div>
+    <div class="row"><span class="small grow"><b>${dv}</b> av ${S.avtale.okter} økter${xs.length?` · ${xs.length} ekstra planlagt`:''}</span></div>
+    <div class="progress" role="progressbar" aria-valuemin="0" aria-valuemax="${S.avtale.okter}" aria-valuenow="${dv}"><i style="width:${Math.min(100,dv/S.avtale.okter*100)}%"></i></div>
+    ${weekRowI(vw,n)}${legend()}
+    ${xs.map(x=>{const today=vw===n.week&&x.d===n.day, past=vw<n.week||(vw===n.week&&x.d<n.day);const lw=(EXTRA_WHAT.find(e=>e[0]===x.what)||['',''])[1];
+      return `<div class="xitem"><span class="dot d-extra" aria-hidden="true">+</span><span class="grow small"><b>${cap(DAYNAMES[x.d])} · ${SLOT_NAMES[x.slot].toLowerCase()}</b><br>${lw}${S.logs[x.k]?' · gjennomført':past?' · ble ikke noe av, helt greit':''}</span>
+        ${!S.logs[x.k]&&today?`<button class="btn btn-green" style="min-height:44px;padding:0 12px" data-a="doneExtra" data-k="${x.k}">Gjennomført</button>`:''}
+        ${!S.logs[x.k]&&!past?`<button class="btn btn-ghost" style="min-height:44px;padding:0 12px" data-a="rmExtra" data-k="${x.k}">Fjern</button>`:''}</div>`;}).join('')}
+    ${free.length?`<button class="btn btn-ghost btn-wide" data-a="addExtra">${icon.plus}Legg inn en ekstra økt</button><span class="small muted" style="text-align:center">Har du litt ekstra tid? Trykk på en ledig dag eller knappen over.</span>`:''}
+    ${vw!==n.week?`<button class="btn btn-blue btn-wide" data-a="wk" data-n="0">Tilbake til denne uka</button>`:''}
+  </div>`;
+}
+function heiaText(p){
+  const names=(p.mine?['Du']:[]).concat(p.heia||[]);
+  if(!names.length)return 'Ingen har heiet ennå';
+  if(names.length<=3)return names.slice(0,-1).join(', ')+(names.length>1?' og ':'')+names[names.length-1]+' heiet';
+  return names.slice(0,2).join(', ')+' og '+(names.length-2)+' andre heiet';
+}
+function mateExtras(n){
+  const L=[[0,3,'styrke','Julie','JU','#7a5ea8','Styrke i sal 2. Litt usikker i vektavdelingen – blir tryggere med følge.',['Kari']],
+           [1,0,'ute','Andreas','AN','#2b6cb0','Rolig løpetur 5 km, pratetempo. Alle tempo er velkomne.',[]],
+           [2,2,'kondis','Sara','SA','#8c3d6b','Spinning 45 min. Jeg holder av sykkel ved siden av meg.',['Ola']],
+           [3,1,'ute','Ola','OL','#3d7f8c','Gåtur med barnevogn rundt vannet. Barn og vogner er lov!',[]],
+           [-1,2,'styrke','Kari','KA','#b0662b','Knebøy og markløft, rolig progresjon.',['Julie']]];
+  return L.map((x,i)=>({id:'m'+i,d:n.day+x[0],slot:x[1],cat:x[2],who:x[3],ini:x[4],col:x[5],text:x[6],with:x[7]})).filter(x=>x.d>=0&&x.d<=6);
+}
+const PROGRAMS=[
+  {title:'Styrke – hele kroppen',quote:'Vi starter rolig i dag. Ingen skal slite seg ut – målet er at du går hjem med lyst til å komme tilbake.',ex:[['Oppvarming på sykkel','8 min'],['Knebøy','3 × 10'],['Roing i kabel','3 × 10'],['Push-ups eller benkpress','3 × 8'],['Utfall','3 × 8 per bein'],['Planke','3 × 30 sek']]},
+  {title:'Kondisjon i par – intervaller',quote:'I dag jobber vi i par. Du velger tempo selv – snakketempo er helt ok. Vi heier på hverandre.',ex:[['Oppvarming, valgfritt apparat','10 min'],['4 × 4 min intervall','2 min pause mellom'],['Rolig nedtrapping','5 min'],['Tøying sammen','5 min']]}
+];
+const MATE_ST=[['Julie','JU','#7a5ea8','kommer'],['Andreas','AN','#2b6cb0','kommer'],['Kari','KA','#b0662b','sent',10],['Ola','OL','#3d7f8c','ikke'],['Sara','SA','#8c3d6b','kommer']];
+const ST_LBL={kommer:'Kommer',sent:'Kommer sent',ikke:'Tar plan B'};
+function program(nx){const i=plan().findIndex(p=>p.d===nx.d); return PROGRAMS[Math.max(0,i)%PROGRAMS.length];}
+function myStatus(key){if(!S.sess)S.sess={}; return S.sess[key]||{};}
+function setStatus(key,patch){if(!S.sess)S.sess={}; S.sess[key]=Object.assign({},S.sess[key]||{},patch);}
+function sessMsgs(key){
+  const base=[{who:'Kari',text:'Kommer ca. 10 min sent – start uten meg!'},{who:'Jonas',text:'Det går fint, Kari. Vi starter med oppvarming.'}];
+  return base.concat(myStatus(key).msgs||[]);
+}
+function countsText(key){
+  const st=myStatus(key).st; const all=MATE_ST.map(m=>m[3]).concat(st?[st]:[]);
+  const c=k=>all.filter(x=>x===k).length;
+  return `${c('kommer')+c('sent')} kommer${c('sent')?` (${c('sent')} sent)`:''} · ${c('ikke')} tar plan B`;
+}
+function statusBlock(key,nx,isLag){
+  const m=myStatus(key), st=m.st;
+  if(m.askLate) return `<span class="small"><b>Hvor sent kommer du?</b> Jonas og laget får beskjed.</span>
+    <div class="seg">${[10,20,30].map(x=>`<button class="choice" data-a="late" data-k="${key}" data-n="${x}">${x} min</button>`).join('')}</div>
+    <button class="btn btn-ghost btn-wide" style="border-color:var(--line)" data-a="lateCancel" data-k="${key}">Avbryt</button>`;
+  if(!st) return `<div class="row" style="gap:6px;flex-wrap:wrap"><button class="btn btn-green grow" data-a="st" data-k="${key}" data-s="kommer">Jeg kommer</button><button class="btn btn-ghost grow" data-a="askLate" data-k="${key}">Kommer sent</button><button class="btn btn-ghost grow" data-a="st" data-k="${key}" data-s="ikke">Rekker ikke</button></div>`;
+  if(st==='ikke') return `<div class="row"><span class="dot d-planb"></span><span class="grow"><b>Du tar plan B.</b> Laget har fått beskjed.</span></div>
+    <button class="btn btn-blue btn-wide" data-a="sheetB">Velg plan B-økt</button>
+    ${m.asked?'':`<button class="btn btn-ghost btn-wide" data-a="askPlanB" data-k="${key}">Spør om noen vil ta plan B sammen</button>`}
+    <button class="btn" style="min-height:40px;background:none;font-size:13px;text-decoration:underline" data-a="st" data-k="${key}" data-s="kommer">Jeg kommer likevel</button>`;
+  return `<div class="row"><span class="dot d-okt"></span><span class="grow"><b>${st==='sent'?`Du kommer ca. ${m.min} min sent.`:'Du kommer.'}</b> Laget ser det.</span></div>
+    ${nx&&nx.today?'<button class="btn btn-green btn-wide" data-a="doneLag">Merk økta som gjennomført</button>':''}
+    <div class="row" style="gap:6px">${st!=='sent'?`<button class="btn btn-ghost grow" style="border-color:var(--line);min-height:44px" data-a="askLate" data-k="${key}">Kommer sent</button>`:''}<button class="btn btn-ghost grow" style="border-color:var(--line);min-height:44px" data-a="st" data-k="${key}" data-s="ikke">Rekker ikke likevel</button></div>`;
+}
+function lagPanelOkt(n){
+  const nx=nextSession(n);
+  if(!nx)return `<div class="card"><b>Ingen flere lagøkter i programmet.</b><span class="small muted">Se «Veien videre» under Meg.</span></div>`;
+  const key=nx.w+'-'+nx.d, isLag=plan().findIndex(p=>p.d===nx.d)<2, prog=program(nx), m=myStatus(key);
+  if(!isLag)return `<div class="card"><span class="eyebrow">Neste økt</span><b>${cap(DAYNAMES[nx.d])} ${nx.time} · egen økt</b><span class="small muted">Dette er din tredje økt i uka, uten PT. Velg en hjemmeøkt eller bli med noen under «Bli med».</span></div>`;
+  const people=MATE_ST.map(x=>({who:x[0],ini:x[1],col:x[2],st:x[3],min:x[4]})).concat(m.st?[{who:'Du',ini:'DU',col:'#2a7f62',st:m.st,min:m.min}]:[]);
+  return `<div class="card" style="background:var(--navy);color:var(--on-navy);gap:8px">
+      <span class="eyebrow" style="color:var(--on-navy);opacity:.85">${nx.today?'Dagens lagøkt':'Neste lagøkt'} · ${cap(DAYNAMES[nx.d])} ${nx.time}</span>
+      <span style="font-family:var(--display);font-size:24px;font-weight:800;line-height:1.15">${prog.title}</span>
+      <div class="row" style="align-items:flex-start"><span class="av" style="background:#4a6ea8;width:32px;height:32px;font-size:11px">JO</span><span class="small" style="opacity:.95"><b>Jonas:</b> «${prog.quote}»</span></div>
+    </div>
+    ${exp('prog-'+key,`<span class="grow"><b>Dagens program</b><br><span class="small muted">${prog.ex.length} deler · ca. 45 min</span></span>`,`<div>${prog.ex.map(e=>`<div class="ex"><span>${e[0]}</span><span class="muted">${e[1]}</span></div>`).join('')}</div><span class="small muted">Jonas tilpasser alt til dagsformen din.</span>`)}
+    <div class="card"><span class="eyebrow">Din status</span>${statusBlock(key,nx,true)}</div>
+    ${exp('hvem-'+key,`<span class="grow"><b>Hvem kommer</b><br><span class="small muted">${countsText(key)}</span></span>`,people.map(p=>`<div class="row"><span class="av" style="background:${p.col};width:30px;height:30px;font-size:10px">${p.ini}</span><span class="grow">${p.who}</span><span class="pill ${p.st==='ikke'?'pill-blue':p.st==='sent'?'pill-soft':'pill-green'}">${p.st==='sent'?'+'+p.min+' MIN':ST_LBL[p.st].toUpperCase()}</span></div>`).join(''))}
+    <div class="card"><span class="eyebrow">Beskjeder til økta</span>
+      ${sessMsgs(key).map((x,i)=>`<span class="small"><b>${esc(x.who)}:</b> ${esc(x.text)}</span>${x.offer?(x.offer.taken?`<span class="small" style="color:var(--green)"><b>Avtalt!</b> ${esc(x.offer.text)} ligger i kalenderen din.</span>`:`<button class="btn btn-green btn-wide" data-a="acceptOffer" data-k="${key}" data-i="${i-2}">${icon.check}Bli med ${esc(x.offer.who)} – ${esc(x.offer.text)}</button>`):''}`).join('')}
+      <span class="small muted">Bare beskjeder om denne økta. De forsvinner når økta er over, så Heia holdes ren.</span>
+    </div>`;
+}
+function lagPanelBliMed(n){
+  const own=Object.keys(S.extras).filter(k=>+k.split('-')[0]===n.week&&S.extras[k].share&&!S.extras[k].joined).map(k=>({id:'own'+k,own:true,d:+k.split('-')[1],slot:S.extras[k].slot,cat:S.extras[k].what,who:'Deg',ini:'DU',col:'#2a7f62',text:'Din ekstraøkt – laget er spurt.',with:['Julie']}));
+  const all=mateExtras(n).concat(own).sort((a,b)=>a.d-b.d||a.slot-b.slot);
+  const f=S.bmFilter, dsel=(S.bmDay==null?null:S.bmDay);
+  const catOk=x=>f==='alle'||x.cat===f;
+  let items=all.filter(catOk); if(dsel!=null)items=items.filter(x=>x.d===dsel);
+  const dayLbl=d=>(d===n.day?'I dag · ':d===n.day+1?'I morgen · ':'')+cap(DAYNAMES[d])+' '+dateOf(n.week,d);
+  const grid=`<div class="card" style="padding:12px;gap:8px">
+    <div class="row"><span class="eyebrow grow">Ukas ekstraøkter · uke ${n.week+1}</span>${dsel!=null?'<button class="btn" style="min-height:36px;padding:0 8px;background:none;font-size:13px;text-decoration:underline" data-a="bmDay" data-n="-1">Vis hele uka</button>':''}</div>
+    <div class="bmgrid">${DAYS.map((dl,i)=>{const di=all.filter(x=>x.d===i&&catOk(x)); const lag=!!planAt(i); const past=i<n.day;
+      const minis=di.slice(0,3).map(x=>`<span class="mini" style="background:${x.col}" title="${esc(x.who)}">${x.ini}</span>`).join('')+(di.length>3?`<span class="small muted">+${di.length-3}</span>`:'');
+      const meJoined=di.some(x=>S.joins[x.id]);
+      return `<button class="bmday${i===n.day?' today':''}${past?' past':''}" aria-pressed="${dsel===i}" data-a="bmDay" data-n="${i}" aria-label="${cap(DAYNAMES[i])} ${dateOf(n.week,i)}: ${di.length} ekstraøkter${lag?', lagøkt':''}">
+        <span class="small" style="font-weight:800">${dl}</span><span class="muted" style="font-size:11px">${dateOf(n.week,i).split('.')[0]}.</span>
+        ${lag?'<span class="lagtag">LAG</span>':''}<span class="chips">${minis}${meJoined?'<span class="mini" style="background:#2a7f62;box-shadow:0 0 0 2px var(--green)">DU</span>':''}</span></button>`;}).join('')}</div>
+    <span class="small muted">Trykk på en dag for å se hvem som vil trene da. LAG = lagøkta deres.</span></div>`;
+  let lastD=-1;
+  return `<div class="card" style="gap:8px"><span class="small">Ekstraøkter laget har lagt ut. Trykk <b>Bli med</b>, så havner økta i kalenderen din.</span>
+      <button class="btn btn-green btn-wide" data-a="shareExtra">${icon.plus}Legg ut en økt laget kan bli med på</button></div>
+    <div class="seg4" role="group" aria-label="Filtrer">${[['alle','Alle'],['styrke','Styrke'],['kondis','Kondis'],['ute','Ute']].map(([k,l])=>`<button class="choice" aria-pressed="${f===k}" data-a="bmF" data-k="${k}">${l}</button>`).join('')}</div>
+    ${grid}
+    ${items.length?items.map(x=>{
+      const past=x.d<n.day, joined=!!S.joins[x.id];
+      const head=x.d!==lastD?`<span class="eyebrow" style="margin-top:4px">${dayLbl(x.d)}${past?' · passert':''}</span>`:''; lastD=x.d;
+      const withN=x.with.concat(joined?['Du']:[]);
+      return head+`<div class="card" style="${past?'opacity:.55':''}">
+        <div class="row"><span class="av" style="background:${x.col}">${x.ini}</span><div class="grow"><b>${esc(x.who)}</b><div class="small muted">${cap(DAYNAMES[x.d])} ${dateOf(n.week,x.d)} · ${SLOT_NAMES[x.slot].toLowerCase()} kl. ${slotTime(x.slot,x.d)}</div></div><span class="pill ${x.cat==='ute'?'pill-green':x.cat==='kondis'?'pill-blue':'pill-soft'}">${(CAT[x.cat]||'').toUpperCase()}</span></div>
+        <span>${esc(x.text)}</span>
+        <div class="row"><span class="small muted grow">${withN.length?withN.join(', ')+' blir med':'Ingen har meldt seg på ennå'}</span>
+        ${x.own||past?'':`<button class="btn ${joined?'btn-green':'btn-ghost'}" style="min-height:44px" data-a="bmJoin" data-id="${x.id}">${joined?icon.check+'Du blir med':'Bli med'}</button>`}</div>
+      </div>`;}).join(''):`<div class="card"><span class="small muted">${dsel!=null?'Ingen ekstraøkter '+DAYNAMES[dsel]+' ennå. Legg ut en selv!':'Ingen økter i denne kategorien denne uka. Legg ut en selv!'}</span></div>`}`;
+}
+function lagGoal(n){
+  const base=[2,3,4,6,7,8,9][n.day], mine=DAYS.filter((_,d)=>S.logs[n.week+'-'+d]).length, goal=12, tot=Math.min(goal,base+mine);
+  return `<div class="card" style="background:var(--navy);color:var(--on-navy);gap:8px">
+      <span class="eyebrow" style="color:var(--on-navy);opacity:.85">Lagets uke</span>
+      <div class="row"><span class="big" style="font-size:40px">${tot}</span><span>av ${goal} økter sammen denne uka${mine?` – <b>${mine} av dem er dine</b>`:''}</span></div>
+      <div class="progress" style="background:rgba(255,255,255,.18)"><i style="width:${tot/goal*100}%;background:var(--green)"></i></div>
+      <span class="small" style="opacity:.9">Alle økter teller – lagøkter, plan B og ekstraøkter. Ingen toppliste, bare laget.</span>
+    </div>`;
+}
+function lagGoalBand(n){
+  const base=[2,3,4,6,7,8,9][n.day], mine=DAYS.filter((_,d)=>S.logs[n.week+'-'+d]).length, goal=12, tot=Math.min(goal,base+mine);
+  return `<div style="background:var(--navy);color:var(--on-navy);padding:12px max(16px, env(safe-area-inset-left,0px)) 14px max(16px, env(safe-area-inset-right,0px));display:flex;flex-direction:column;gap:8px">
+    <div class="row" style="align-items:baseline;gap:8px"><span class="eyebrow" style="color:var(--on-navy);opacity:.85">Lagets uke</span><span class="grow"></span>
+      <span style="font-family:var(--display);font-size:26px;font-weight:800;line-height:1">${tot}</span><span class="small">av ${goal} økter</span></div>
+    <div class="progress" style="background:rgba(255,255,255,.2);height:10px" role="progressbar" aria-label="Lagets økter denne uka" aria-valuemin="0" aria-valuemax="${goal}" aria-valuenow="${tot}"><i style="width:${tot/goal*100}%;background:var(--green)"></i></div>
+    <span class="small" style="opacity:.9">${mine?`<b>${mine} av dem er dine.</b> `:''}Alle økter teller – også plan B og ekstraøkter.</span>
+  </div>`;
+}
+function lagPanelHeia(n){
+  return S.feed.filter(p=>p.type==='okt'||p.type==='planb').map(p=>{
+    const open=S.cmtOpen===p.id;
+    return `<div class="card">
+      <div class="row"><span class="av" style="background:${p.col}">${p.ini}</span><div class="grow"><b>${esc(p.who)}</b><div class="small muted">${p.when}</div></div>
+        ${p.type==='okt'?'<span class="pill pill-green">ØKT</span>':p.type==='planb'?'<span class="pill pill-blue">PLAN B</span>':p.type==='msg'?'<span class="pill pill-soft">BESKJED</span>':'<span class="pill pill-soft">PT</span>'}</div>
+      <span>${esc(p.text)}</span>
+      ${p.mood?`<span class="small muted">Kjentes: ${p.mood}</span>`:''}
+      <div class="row" style="flex-wrap:wrap;gap:8px">
+        ${p.self?'':`<button class="btn ${p.mine?'btn-green':'btn-ghost'}" style="min-height:44px;padding:0 14px" data-a="heia" data-id="${p.id}" aria-pressed="${!!p.mine}">${p.mine?'Du heiet!':'Heia!'}</button>`}
+        <button class="btn btn-ghost" style="min-height:44px;padding:0 14px;border-color:var(--line)" data-a="toggleCmt" data-id="${p.id}">Kommenter${p.comments.length?' ('+p.comments.length+')':''}</button>
+      </div>
+      <span class="small muted">${heiaText(p)}</span>
+      ${p.comments.length?`<div style="display:flex;flex-direction:column;gap:6px;border-top:1px solid var(--line);padding-top:8px">${p.comments.map(c=>`<span class="small"><b>${esc(c.who)}:</b> ${esc(c.text)}</span>`).join('')}</div>`:''}
+      ${open?`<div style="display:flex;flex-direction:column;gap:8px">
+        <div class="row" style="flex-wrap:wrap;gap:6px">${['Sterkt!','Godt jobba!','Rekka holder!'].map(t=>`<button class="pill pill-soft" style="border:none;min-height:36px;padding:6px 12px" data-a="cmtQuick" data-id="${p.id}" data-t="${t}">${t}</button>`).join('')}</div>
+        <div class="row"><label for="cmt-${p.id}" class="small" style="position:absolute;width:1px;height:1px;overflow:hidden">Kommentar</label><input id="cmt-${p.id}" type="text" data-f="cmt" placeholder="Skriv en kommentar" value="${esc(S.cmtText)}"><button class="btn btn-green" style="min-height:44px;padding:0 14px" data-a="sendCmt" data-id="${p.id}">Send</button></div></div>`:''}
+    </div>`;}).join('');
+}
+function vLaget(){
+  const n=now(), t=(S.lagTab&&S.lagTab!=='uka')?S.lagTab:'okt';
+  return `<div class="top"><div class="grow"><h1>${teamName()}</h1><div class="sub">${cap(lagTimes())} · PT Jonas · 6 på laget</div></div></div>
+  ${lagGoalBand(n)}
+  <div class="scroll">
+    <div class="seg" role="tablist" aria-label="Laget">${[['okt','Lagøkta'],['blimed','Bli med'],['heia','Heia']].map(([k,l])=>`<button class="choice" role="tab" aria-selected="${t===k}" aria-pressed="${t===k}" data-a="lagTab" data-k="${k}">${l}</button>`).join('')}</div>
+    ${t==='okt'?lagPanelOkt(n):t==='blimed'?lagPanelBliMed(n):lagPanelHeia(n)}
+  </div>`;
+}
+function vHjemme(){
+  return `<div class="top"><div class="grow"><h1>Hjemmeøkter</h1><div class="sub">Fra PT Jonas · plan B-biblioteket</div></div></div>
+  <div class="scroll">
+    <div class="card" style="background:var(--blue-soft);flex-direction:row;align-items:center"><span class="dot d-planb"></span><span class="small">Alle øktene her gir et <b>blått merke</b> i kalenderen din. Plan B teller!</span></div>
+    ${WORKOUTS.map(w=>exp('w-'+w.id,`<span class="av" style="background:var(--navy);border-radius:12px;width:52px;height:52px;flex-direction:column;font-size:18px;line-height:1">${w.min}<span style="font-size:10px;font-weight:500">min</span></span><span class="grow"><b>${w.name}</b><br><span class="small muted">${w.desc}</span></span>`,
+      `<div>${w.ex.map(e=>`<div class="ex"><span>${e[0]}</span><span class="muted">${e[1]}</span></div>`).join('')}</div><button class="btn btn-green btn-wide" data-a="start" data-w="${w.id}">Start økta</button>`)).join('')}
+  </div>`;
+}
+function vMeg(){
+  const a=S.avtale, n=now();
+  return `<div class="top"><span class="av" style="background:#2a7f62;width:44px;height:44px">DU</span><div class="grow"><h1>Meg</h1><div class="sub">${teamName()} · uke ${n.week+1} av 6</div></div></div>
+  <div class="scroll">
+    ${exp('avt','<b class="grow">Min avtale</b>',`<div class="small"><b>Mål:</b> ${esc(a.mal)}</div><div class="small"><b>Økter i uka:</b> ${a.okter}</div><div class="small"><b>Faste tider:</b> ${lagTimes()}</div><div class="small"><b>Plan B:</b> ${esc(a.custom||a.planB)}</div><div class="small"><b>Støtte:</b> ${[a.stotte.lag&&teamName(),a.stotte.pt&&'PT Jonas',a.stotte.hjemme&&'familien hjemme'].filter(Boolean).join(', ')||'–'}</div><button class="btn btn-ghost" data-a="go" data-s="ukekart">Endre ukekartet</button>`)}
+    ${exp('vei','<span class="grow"><b>Uke 6 – veien videre</b><br><span class="small muted">Hva skjer etter programmet?</span></span>',`
+      <span class="small">Seks uker er ikke nok til at treningen går av seg selv – men nok til å ha et lag som bærer den videre.</span>
+      <div class="steps">
+        <div class="stair" style="background:var(--green);color:var(--on-green);height:150px"><b>Uke 1–6</b>COMEBACK<span style="margin-top:auto">PT 2 i uka</span></div>
+        <div class="stair" style="background:var(--green-soft);border:2px solid var(--green);height:120px"><b>Uke 7–12</b>Laget<span style="margin-top:auto">PT 1 i uka</span></div>
+        <div class="stair" style="background:var(--surface-2);height:90px"><b>Uke 13 →</b>Selvgående<span style="margin-top:auto">Laget selv</span></div>
+      </div>
+      <span class="small"><b>På avslutningsmøtet</b> ser dere på hva som har kjentes bra, hvor ofte plan B ble brukt, og laget velger hvordan dere fortsetter. Alle skriver en ny, lettere avtale.</span>`)}
+    ${exp('hjelp','<b class="grow">Slik måler vi om det funker</b>','<span class="small">Ikke testresultater. Det viktigste er om du fortsatt trener etter 3 og 6 måneder.</span>')}
+    ${exp('test','<span class="grow"><b>Testmodus</b><br><span class="small muted">For dere som kjører brukertesten</span></span>',`
+      <label class="check" for="simon"><input id="simon" type="checkbox" data-c="sim" ${S.sim.on?'checked':''}>Velg dag selv i stedet for dagens dato</label>
+      ${S.sim.on?`<span class="eyebrow">Uke</span><div class="seg6">${[0,1,2,3,4,5].map(w=>`<button class="choice" aria-pressed="${S.sim.week===w}" data-a="simW" data-n="${w}">${w+1}</button>`).join('')}</div>
+      <span class="eyebrow">Dag</span><div class="seg7">${DAYS.map((d,i)=>`<button class="choice" aria-pressed="${S.sim.day===i}" data-a="simD" data-n="${i}">${d}</button>`).join('')}</div>
+      <span class="small muted">Tips: Velg en av lagdagene for å teste «Rekker ikke» og plan B.</span>`:`<span class="small muted">Nå følger appen dagens dato. Uke 1 startet ${weekLabel(0)}.</span>`}
+      <button class="btn btn-ghost" data-a="reset">Start prototypen på nytt</button>`)}
+  </div>`;
+}
+
+/* ---------- workout + log ---------- */
+function vSession(){
+  const w=WORKOUTS.find(x=>x.id===S.session.w), i=S.session.i, e=w.ex[i];
+  return `<div class="top"><button class="btn" style="padding:0 6px;min-height:44px;background:none" data-a="quit" aria-label="Avbryt">${icon.back}</button><div class="grow"><div class="eyebrow">${w.name} · ${w.min} min</div><h1>Øvelse ${i+1} av ${w.ex.length}</h1></div></div>
+  <div class="scroll">
+    <div class="progress"><i style="width:${(i+1)/w.ex.length*100}%"></i></div>
+    <div class="card" style="align-items:center;text-align:center;padding:36px 16px;gap:8px"><span style="font-family:var(--display);font-size:30px;font-weight:800;text-wrap:balance">${e[0]}</span><span style="font-size:20px" class="muted">${e[1]}</span></div>
+    ${i<w.ex.length-1?`<span class="small muted" style="text-align:center">Neste: ${w.ex[i+1][0]}</span><button class="btn btn-green btn-wide" data-a="nextEx">Neste øvelse</button>`:`<button class="btn btn-green btn-wide" data-a="endSession">Ferdig!</button>`}
+    <button class="btn btn-ghost btn-wide" data-a="endSession">Avslutt tidlig – det teller likevel</button>
+  </div>`;
+}
+function vLogg(){
+  const L=S.logg;
+  return `<div class="top"><div class="grow"><h1>Økt fullført</h1></div></div>
+  <div class="scroll">
+    <div style="display:flex;flex-direction:column;align-items:center;gap:6px;padding:6px 0">
+      <span class="av" style="width:64px;height:64px;background:${L.logType==='xdone'?'var(--amber)':L.type==='okt'?'var(--green)':'var(--blue)'};color:${L.logType==='xdone'?'#3a2a00':L.type==='okt'?'var(--on-green)':'var(--on-blue)'}">${icon.check}</span>
+      <span style="font-family:var(--display);font-size:24px;font-weight:800">Bra jobba!</span><span class="muted">${esc(L.name)}</span></div>
+    <div class="card"><b style="font-size:17px">Hvordan kjentes økta?</b>
+      <div class="seg">${MOODS.map(m=>`<button class="mood" aria-pressed="${L.mood===m[0]}" data-a="mood" data-m="${m[0]}">${face(m[2])}${m[1]}</button>`).join('')}</div>
+      <span class="small muted">Bare PT-en din ser svaret, og bruker det til å justere neste økt.</span></div>
+    <div class="card"><span class="eyebrow">Registreres som</span>
+      <div class="row"><span class="dot ${L.logType==='xdone'?'d-xdone':L.type==='okt'?'d-okt':'d-planb'}"></span><span><b>${L.logType==='xdone'?'Ekstra økt':L.type==='okt'?'Økt':'Plan B'}</b> – ${L.logType==='xdone'?'gult':L.type==='okt'?'grønt':'blått'} merke ${DAYNAMES[now().day]}</span></div>
+      <label class="check" for="share"><input id="share" type="checkbox" data-c="share" ${L.share?'checked':''}>Del med ${teamName()}</label></div>
+    <button class="btn btn-green btn-wide" data-a="saveLog">Lagre</button>
+  </div>`;
+}
+function vSheet(){
+  if(S.sheet==='planb'){
+    return `<div class="scrim" data-a="closeSheet"><div class="sheet" role="dialog" aria-label="Rekker ikke økta" data-stop="1">
+      <b style="font-size:19px">Rekker ikke? Helt greit.</b>
+      <span class="small">Laget får beskjed. Din plan B: <b>${esc(S.avtale.custom||S.avtale.planB)}</b></span>
+      ${WORKOUTS.map(w=>`<button class="choice" data-a="start" data-w="${w.id}"><span class="row"><span class="dot d-planb"></span><span class="grow">${w.name} · ${w.min} min<br><span class="small muted" style="font-weight:500">${w.desc}</span></span></span></button>`).join('')}
+      <button class="btn btn-ghost btn-wide" data-a="closeSheet">Lukk</button></div></div>`;
+  }
+  if(S.sheet==='extra'&&S.draft){
+    const D=S.draft, n=now(), free=freeDays(D.w,n);
+    return `<div class="scrim" data-a="closeSheet"><div class="sheet" role="dialog" aria-label="Legg inn ekstra økt" data-stop="1">
+      <b style="font-size:19px">Ekstra økt i uke ${D.w+1}</b>
+      <span class="small">En ekstra økt er en bonus. Blir det ikke noe av, teller det ikke mot deg.</span>
+      <span class="eyebrow">Dag</span>
+      <div class="seg7">${DAYS.map((d,i)=>`<button class="choice" aria-pressed="${D.d===i}" data-a="dD" data-n="${i}" ${free.includes(i)?'':'disabled style="opacity:.35"'} aria-label="${DAYNAMES[i]}">${d}</button>`).join('')}</div>
+      <span class="eyebrow">Når på dagen</span>
+      <div class="seg4">${SLOT_NAMES.map((s,i)=>`<button class="choice" aria-pressed="${D.slot===i}" data-a="dS" data-n="${i}">${s}</button>`).join('')}</div>
+      ${S.map[D.slot]&&S.map[D.slot][D.d]==='o'?'<span class="small" style="color:var(--amber-edge)"><b>Obs:</b> Denne tiden merket du som opptatt i ukekartet.</span>':''}
+      <span class="eyebrow">Hva vil du gjøre?</span>
+      ${EXTRA_WHAT.map(([k,l])=>`<button class="choice" aria-pressed="${D.what===k}" data-a="dW" data-k="${k}">${l}</button>`).join('')}
+      <label class="check" for="xshare"><input id="xshare" type="checkbox" data-c="xshare" ${D.share?'checked':''}>Spør laget om noen vil bli med</label>
+      <button class="btn btn-green btn-wide" data-a="saveExtra" ${D.d==null?'disabled':''}>Legg inn</button>
+      <button class="btn btn-ghost btn-wide" data-a="closeSheet">Avbryt</button></div></div>`;
+  }
+  if(S.sheet==='compose'){
+    return `<div class="scrim" data-a="closeSheet"><div class="sheet" role="dialog" aria-label="Spør laget" data-stop="1">
+      <b style="font-size:19px">Spør om noen vil trene</b>
+      <label for="cmp" class="small">Hva, når og hvor?</label>
+      <textarea id="cmp" data-f="compose" placeholder="F.eks. Gåtur torsdag 20:00 rundt Sognsvann – noen?">${esc(S.compose)}</textarea>
+      <button class="btn btn-green btn-wide" data-a="post">Legg ut til laget</button>
+      <button class="btn btn-ghost btn-wide" data-a="closeSheet">Avbryt</button></div></div>`;
+  }
+  return '';
+}
+
+function render(keepScroll){
+  const app=document.getElementById('app');
+  const sc=app.querySelector('.scroll'); const top=keepScroll&&sc?sc.scrollTop:0;
+  let h='';
+  if(S.session)h=vSession();
+  else if(S.logg)h=vLogg();
+  else if(S.screen==='sms')h=vSms();
+  else if(S.screen==='oppstart')h=vOppstart();
+  else if(S.screen==='ukekart')h=vUkekart();
+  else if(S.screen==='lag')h=vLag();
+  else if(S.screen==='avtale')h=vAvtale();
+  else {
+    h=({uka:vUka,laget:vLaget,hjemme:vHjemme,meg:vMeg}[S.tab]||vUka)();
+    h+=`<nav class="tabs" aria-label="Hovedmeny">${[['uka','Uka'],['laget','Laget'],['hjemme','Hjemmeøkter'],['meg','Meg']].map(([k,l])=>`<button class="tab" data-a="tab" data-t="${k}" ${S.tab===k?'aria-current="page"':''}><span class="ic">${icon[k]}${k==='laget'&&S.lagNew?'<span class="badge" aria-label="Nytt fra laget"></span>':''}</span>${l}</button>`).join('')}</nav>`;
+  }
+  h+=vSheet();
+  if(S.toast)h+=`<div class="toast" role="status">${icon.check}<span>${esc(S.toast)}</span></div>`;
+  app.innerHTML=h;
+  const nsc=app.querySelector('.scroll'); if(nsc)nsc.scrollTop=top;
+  save();
+}
+function simHeia(pid,reply){
+  setTimeout(()=>{const p=S.feed.find(x=>x.id===pid); if(!p)return; if(S.tab!=='laget')S.lagNew=true; p.heia.push('Julie'); if(reply){p.comments.push({who:'Julie',text:reply}); p.offer={who:'Julie',text:'gåtur i dag kl. 20:00',slot:3,cat:'ute'};} toast(reply?'Julie svarte deg – se svaret under «Dine beskjeder»':'Julie heiet på deg'); render(true);},2600);
+  setTimeout(()=>{const p=S.feed.find(x=>x.id===pid); if(!p)return; p.heia.push('Jonas'); if(p.type==='planb')p.comments.push({who:'Jonas',text:'Bra at du tok plan B – det er sånn rutiner holder.'}); if(S.tab!=='laget')S.lagNew=true; render(true);},5200);
+}
+function toast(msg){S.toast=msg;clearTimeout(toastTimer);toastTimer=setTimeout(()=>{S.toast=null;render(true)},2800);}
+
+document.getElementById('app').addEventListener('click',e=>{
+  const b=e.target.closest('[data-a]'); if(!b||b.disabled)return;
+  if(b.classList.contains('scrim')&&e.target.closest('[data-stop]'))return;
+  const a=b.dataset.a; let keep=true; const n=now();
+  switch(a){
+    case 'toggle': S.open[b.dataset.id]=!S.open[b.dataset.id]; break;
+    case 'go': S.screen=b.dataset.s; keep=false; break;
+    case 'smsYes': S.smsReply=true; break;
+    case 'smsMore': S.smsMore=true; break;
+    case 'slot': {const r=+b.dataset.r,d=+b.dataset.d,c=S.map[r][d]; S.map[r][d]=c==='o'?'k':c==='k'?'r':'o'; break;}
+    case 'clearMap': S.map=S.map.map(r=>r.map(()=>'o')); break;
+    case 'exampleMap': S.map=initial().map; break;
+    case 'findTeam': computePicks(); S.avtale.okter=Math.max(1,Math.min(S.avtale.okter,S.picks.length||1)); S.screen='lag'; keep=false; break;
+    case 'okter': S.avtale.okter=+b.dataset.n; break;
+    case 'planb': S.avtale.planB=PLANB[+b.dataset.i]; S.avtale.custom=''; break;
+    case 'sign': S.avtale.signert=true; break;
+    case 'finish': if(!S.start)S.start=new Date().toISOString(); S.screen='app'; S.tab='uka'; keep=false; toast('Avtalen er signert. Velkommen til '+teamName()+'!'); break;
+    case 'tab': S.tab=b.dataset.t; S.sheet=null; if(S.tab==='laget')S.lagNew=false; keep=false; break;
+    case 'goHeia': S.tab='laget'; S.lagTab='heia'; S.lagNew=false; keep=false; break;
+    case 'dismissShared': S.lastShared=null; break;
+    case 'attend': {const nx=nextSession(n); if(nx){S.attending=nx.w+'-'+nx.d; toast('Laget ser at du kommer '+(nx.today?'i dag':DAYNAMES[nx.d])+' kl. '+nx.time);} break;}
+    case 'doneLag': S.logg={type:'okt',name:'Lagøkt med PT · '+teamName(),mood:null,share:true}; keep=false; break;
+    case 'sheetB': S.sheet='planb'; break;
+    case 'wk': {const cur=S.viewWeek==null?n.week:S.viewWeek, d=+b.dataset.n; const nw=d===0?n.week:Math.max(0,Math.min(5,cur+d)); S.viewWeek=nw===n.week?null:nw; break;}
+    case 'cell': {const w=+b.dataset.w,d=+b.dataset.d,k=w+'-'+d;
+      if(S.logs[k]){toast('Den dagen er allerede logget');break;}
+      if(S.extras[k]){toast('Ekstra økt er lagt inn – se listen under');break;}
+      const p=planAt(d); if(p&&(w>n.week||(w===n.week&&d>=n.day))){toast('Her har du '+(plan().indexOf(p)<2?'lagøkt':'egen økt')+' kl. '+p.time);break;}
+      if(w<n.week||(w===n.week&&d<n.day)){toast('Den dagen har passert');break;}
+      S.draft={w,d,slot:3,what:'hjemme',share:false}; S.sheet='extra'; break;}
+    case 'addExtra': {const w=S.viewWeek==null?n.week:S.viewWeek; const f=freeDays(w,n); S.draft={w,d:f.length?f[0]:null,slot:3,what:'hjemme',share:false}; S.sheet='extra'; break;}
+    case 'dD': S.draft.d=+b.dataset.n; break;
+    case 'dS': S.draft.slot=+b.dataset.n; break;
+    case 'dW': S.draft.what=b.dataset.k; break;
+    case 'saveExtra': {const D=S.draft; if(D.d==null)break; S.extras[D.w+'-'+D.d]={slot:D.slot,what:D.what,share:!!D.share};
+      const lw=(EXTRA_WHAT.find(e=>e[0]===D.what)||['',''])[1];
+      S.sheet=null; S.draft=null; toast('Ekstra økt lagt inn '+DAYNAMES[D.d]+(D.share?' – den ligger under Laget › Bli med':'')); break;}
+    case 'rmExtra': delete S.extras[b.dataset.k]; toast('Ekstra økt fjernet'); break;
+    case 'doneExtra': {const x=S.extras[b.dataset.k]; const lw=(EXTRA_WHAT.find(e=>e[0]===(x&&x.what))||['','Ekstra økt'])[1]||'Ekstra økt'; S.logg={type:'okt',logType:'xdone',name:'Ekstra økt · '+lw,mood:null,share:true}; keep=false; break;}
+    case 'sheetCompose': S.sheet='compose'; break;
+    case 'closeSheet': if(e.target!==b&&b.classList.contains('scrim'))return; S.sheet=null; break;
+    case 'start': S.session={w:b.dataset.w,i:0}; S.sheet=null; keep=false; break;
+    case 'nextEx': S.session.i++; break;
+    case 'quit': S.session=null; keep=false; break;
+    case 'endSession': {const w=WORKOUTS.find(x=>x.id===S.session.w); S.logg={type:'planb',name:w.name+' · '+w.min+' min',mood:null,share:true}; S.session=null; keep=false; break;}
+    case 'mood': S.logg.mood=b.dataset.m; break;
+    case 'saveLog': {
+      const L=S.logg; S.logs[n.week+'-'+n.day]=L.logType||L.type;
+      if(L.type==='okt')S.attending=null;
+      if(L.share){const md=(MOODS.find(m=>m[0]===L.mood)||[])[1]; const pid=Date.now(); S.lastShared=pid; S.feed.unshift({id:pid,who:'Deg',ini:'DU',col:'#2a7f62',when:'nå nettopp',type:L.type,text:L.name+(L.type==='planb'?' – rekka holder!':''),mood:md,heia:[],comments:[],self:true}); simHeia(pid);}
+      toast((L.logType==='xdone'?'Gult merke lagt til – ekstra innsats!':L.type==='okt'?'Grønt merke lagt til':'Blått merke lagt til – rekka holder!')+(L.share?' Delt med laget.':''));
+      S.logg=null; S.screen='app'; S.tab='uka'; keep=false; break;}
+    case 'heia': {const p=S.feed.find(x=>x.id==b.dataset.id); if(p)p.mine=!p.mine; break;}
+    case 'lagTab': S.lagTab=b.dataset.k; S.cmtOpen=null; keep=false; break;
+    case 'bmF': S.bmFilter=b.dataset.k; break;
+    case 'bmDay': {const v=+b.dataset.n; S.bmDay=(v<0||S.bmDay===v)?null:v; break;}
+    case 'shareExtra': {const f=freeDays(n.week,n); S.draft={w:n.week,d:f.length?f[0]:null,slot:3,what:'styrke',share:true}; S.sheet='extra'; break;}
+    case 'bmJoin': {const id=b.dataset.id, x=mateExtras(n).find(m=>m.id===id); if(!x)break; const k=n.week+'-'+x.d;
+      if(S.joins[id]){delete S.joins[id]; if(S.extras[k]&&S.extras[k].joined===id)delete S.extras[k]; toast('Du er meldt av'); break;}
+      if(planAt(x.d)||S.extras[k]||S.logs[k]){toast('Du har allerede noe '+DAYNAMES[x.d]+' – sjekk kalenderen');break;}
+      S.joins[id]=true; S.extras[k]={slot:x.slot,what:x.cat,joined:id}; toast(x.who+' får beskjed – økta ligger i kalenderen din'); break;}
+    case 'goOkt': S.tab='laget'; S.lagTab='okt'; keep=false; break;
+    case 'st': {const k=b.dataset.k, v=b.dataset.s; setStatus(k,{st:v,askLate:false}); if(v==='kommer'){S.attending=k; toast('Laget ser at du kommer');} else {S.attending=null; S.sheet='planb'; toast('Laget har fått beskjed – velg plan B');} break;}
+    case 'askLate': setStatus(b.dataset.k,{askLate:true}); break;
+    case 'lateCancel': setStatus(b.dataset.k,{askLate:false}); break;
+    case 'late': {const k=b.dataset.k, mn=+b.dataset.n; const m=myStatus(k); setStatus(k,{st:'sent',min:mn,askLate:false,msgs:(m.msgs||[]).concat([{who:'Du',text:'Kommer ca. '+mn+' min sent.'}])}); S.attending=k; toast('Jonas og laget har fått beskjed');
+      setTimeout(()=>{const mm=myStatus(k); setStatus(k,{msgs:(mm.msgs||[]).concat([{who:'Jonas',text:'Takk for beskjed! Vi venter med parøvelsene til du er her.'}])}); render(true);},2600); break;}
+    case 'askPlanB': {const k=b.dataset.k; const m=myStatus(k); setStatus(k,{asked:true,msgs:(m.msgs||[]).concat([{who:'Du',text:'Noen som vil ta plan B sammen?'}])}); toast('Spurt i beskjedene til økta');
+      setTimeout(()=>{const mm=myStatus(k); setStatus(k,{msgs:(mm.msgs||[]).concat([{who:'Julie',text:'Jeg tar også plan B i dag! Gåtur kl. 20?',offer:{who:'Julie',text:'gåtur i dag kl. 20:00',slot:3,cat:'ute'}}])}); toast('Julie svarte deg'); render(true);},2600); break;}
+    case 'acceptOffer': {const k=b.dataset.k, i=+b.dataset.i, m=myStatus(k), x=(m.msgs||[])[i]; if(!x||!x.offer)break; const tk=n.week+'-'+n.day;
+      if(S.logs[tk]||S.extras[tk]){toast('Du har allerede noe i dag – sjekk kalenderen');break;}
+      S.extras[tk]={slot:x.offer.slot,what:x.offer.cat,joined:'offer'}; x.offer.taken=true; m.msgs.push({who:'Du',text:'Jeg blir med!'}); setStatus(k,{msgs:m.msgs});
+      toast('Avtalt med '+x.offer.who+' – lagt inn i kalenderen'); break;}
+    case 'toggleCmt': {const id=+b.dataset.id; S.cmtOpen=S.cmtOpen===id?null:id; S.cmtText=''; break;}
+    case 'cmtQuick': case 'sendCmt': {const p=S.feed.find(x=>x.id==b.dataset.id); const t=(a==='cmtQuick'?b.dataset.t:S.cmtText).trim(); if(!p||!t)break; p.comments.push({who:'Du',text:t}); S.cmtText=''; S.cmtOpen=null; break;}
+    case 'simW': S.sim.week=+b.dataset.n; break;
+    case 'simD': S.sim.day=+b.dataset.n; break;
+    case 'reset': S=initial(); keep=false; break;
+  }
+  render(keep);
+});
+document.getElementById('app').addEventListener('input',e=>{
+  const f=e.target.dataset.f; if(!f)return;
+  if(f==='compose')S.compose=e.target.value; else if(f==='cmt')S.cmtText=e.target.value; else S.avtale[f]=e.target.value;
+  save();
+});
+document.getElementById('app').addEventListener('change',e=>{
+  const c=e.target.dataset.c; if(!c)return;
+  if(c==='share')S.logg.share=e.target.checked;
+  else if(c==='xshare'){if(S.draft)S.draft.share=e.target.checked;}
+  else if(c==='henting')S.avtale.henting=e.target.checked;
+  else if(c==='sim'){S.sim.on=e.target.checked; if(S.sim.on){const r=now(); /* start from today */ const t=new Date(); S.sim.day=(t.getDay()+6)%7;}}
+  else S.avtale.stotte[c]=e.target.checked;
+  render(true);
+});
+render();
+})();
+</script>
+
+</body>
+</html>
